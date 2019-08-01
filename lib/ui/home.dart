@@ -7,7 +7,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
@@ -32,7 +31,6 @@ class _HomeState extends State<Home> {
     });
   }
 
-
   List<int> operacoes = List();
 
   @override
@@ -43,40 +41,41 @@ class _HomeState extends State<Home> {
         centerTitle: true,
         backgroundColor: Colors.deepPurple,
       ),
-      body:
-        Column(
-          children: <Widget>[
-            Card(
-              child: Row(
-                children: <Widget>[
-                      Text("Total Gasto: xxxxx",
-                      style: TextStyle(fontSize: 20.0, color: Colors.white),
-                      textAlign: TextAlign.center,
-                       )
-                ],
-              ),
-             color: Colors.deepPurple,
+      body: Column(
+        children: <Widget>[
+          Card(
+            child: Row(
+              children: <Widget>[
+                Text(
+                  "Total Gasto: xxxxx",
+                  style: TextStyle(fontSize: 20.0, color: Colors.white),
+                  textAlign: TextAlign.center,
+                )
+              ],
             ),
-            Expanded(
-              child: Padding(
+            color: Colors.deepPurple,
+          ),
+          Expanded(
+            child: Padding(
               padding: EdgeInsets.all(10.0),
-                child: ListView.builder(
-                  itemBuilder: (context, index){
-                    return _movimentacao(context, index);
-                    },
-                  itemCount: 3,
-                ),
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return _movimentacao(context, index);
+                },
+                itemCount: 3,
               ),
-              ),
-
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.deepPurple,
-          child: Icon(Icons.add),
-          onPressed: (){print(operacoes.length);},
-        ),
-        bottomNavigationBar: BottomNavigationBar(
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.deepPurple,
+        child: Icon(Icons.add),
+        onPressed: () {
+          print(operacoes.length);
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -112,18 +111,26 @@ class _HomeState extends State<Home> {
           child: Row(
             children: <Widget>[
               Column(
-                children: <Widget>[
-                  Icon(Icons.attach_money)
-                ],
+                children: <Widget>[Icon(Icons.attach_money)],
               ),
               Column(
                 children: <Widget>[
-                Text("Tipo do pagamento",textAlign: TextAlign.start, style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold)),
-                Text("Valor", textAlign: TextAlign.start, style: TextStyle(fontSize: 15.0,)),
-                Text(formatDate(DateTime.now(),[dd, '/', mm, '/', yyyy, ' ', HH,':', nn]).toString(), textAlign: TextAlign.start,),
+                  Text("Tipo do pagamento",
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.bold)),
+                  Text("Valor",
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontSize: 15.0,
+                      )),
+                  Text(
+                    formatDate(DateTime.now(),
+                        [dd, '/', mm, '/', yyyy, ' ', HH, ':', nn]).toString(),
+                    textAlign: TextAlign.start,
+                  ),
                 ],
               )
-
             ],
           ),
         ),
