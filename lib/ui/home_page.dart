@@ -256,6 +256,7 @@ class _HomeState extends State<Home> {
               Column(
                 children: <Widget>[Icon(selecionaIcone(operacoes[index].tipo))],
               ),
+              SizedBox(width: 55.0,),
               Column(
                 children: <Widget>[
                   Text(operacoes[index].tipo,
@@ -274,6 +275,7 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
+              SizedBox(width: 50.0,),
               Column(
                 children: <Widget>[
                   Padding(
