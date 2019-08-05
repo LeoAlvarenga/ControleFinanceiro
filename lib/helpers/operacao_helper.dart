@@ -79,6 +79,16 @@ class OperacaoHelper {
     return listOperacao;
   }
 
+  Future<List> getSelectedOperacoes(String tipoSelecionado) async {
+    Database dbOperacao = await db;
+    List listMap = await dbOperacao.query(operacoesTable, where: "$tipoColumn = ?", whereArgs: [tipoSelecionado]);
+    List<Operacao> listOperacao = List();
+    for(Map m in listMap){
+      listOperacao.add(Operacao.fromMap(m));
+    }
+    return listOperacao;
+  }
+
   Future<int> getNumber() async {
     Database dbOperacao = await db;
     return Sqflite.firstIntValue(await dbOperacao.rawQuery("SELECT COUNT(*) FROM $operacoesTable"));

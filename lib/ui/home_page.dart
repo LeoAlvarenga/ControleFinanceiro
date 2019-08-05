@@ -14,15 +14,18 @@ class _HomeState extends State<Home> {
 
   String _valorTotal = "0";
 
+  int _selectedIndex = 0;
+
   @override
   void initState() {
     super.initState();
 
-    _getAllContacts();
+    _getOperacoes(_selectedIndex);
+
+    print(operacoes);
   }
 
   //configurações do BottomNavigator
-  int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
@@ -47,6 +50,7 @@ class _HomeState extends State<Home> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _getOperacoes(_selectedIndex);
     });
   }
 
@@ -91,7 +95,7 @@ class _HomeState extends State<Home> {
         child: Icon(Icons.add),
         onPressed: () {
           createDialog(context);
-          _getAllContacts();
+          _getOperacoes(_selectedIndex);
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -206,7 +210,7 @@ class _HomeState extends State<Home> {
                           onPressed: () async {
                             await helper.saveOperacao(_novaOperacao);
                             print("Operacao salva");
-                            _getAllContacts();
+                            _getOperacoes(_selectedIndex);
                             Navigator.pop(context);
                           },
                           textColor: Colors.white,
@@ -280,7 +284,7 @@ class _HomeState extends State<Home> {
                       onPressed:() async { 
                         await helper.deleteOperacao(operacoes[index].id);
                         print("Deletado operação id:" + operacoes[index].id.toString());
-                        _getAllContacts();
+                        _getOperacoes(_selectedIndex);
                         },
                     ),
                   )
@@ -310,8 +314,38 @@ class _HomeState extends State<Home> {
     }
   }
 
-  void _getAllContacts() {
+void _getOperacoes(int tipo) {
+    switch (tipo) {
+      case 0:
+        _getAllOperacoes();
+        break;
+      case 1:
+        _getSelectedOperacoes("Crédito");
+        break;
+      case 2:
+        _getSelectedOperacoes("Débito");
+        break;
+      case 3:
+        _getSelectedOperacoes("Saque");
+        break;
+      default:
+        tipo = 0;
+        break;
+    }
+  }
+
+  void _getAllOperacoes() {
     helper.getAllOperacoes().then((list) {
+      setState(() {
+        operacoes = list;
+        atualizaValor();
+        print(operacoes);
+      });
+    });
+  }
+
+  void _getSelectedOperacoes(String tipoSelecionado) {
+    helper.getSelectedOperacoes(tipoSelecionado).then((list) {
       setState(() {
         operacoes = list;
         atualizaValor();
