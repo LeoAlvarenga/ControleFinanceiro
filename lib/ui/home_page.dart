@@ -12,6 +12,8 @@ class _HomeState extends State<Home> {
 
   List<Operacao> operacoes = List();
 
+  Operacao _operacaoRemoved = Operacao();
+
   String _valorTotal = "0";
 
   int _selectedIndex = 0;
@@ -177,6 +179,7 @@ class _HomeState extends State<Home> {
                             });
                           },
                           hint: Text("Selecione o Tipo"),
+                          
                         ),
                       ],
                     ),
@@ -186,6 +189,7 @@ class _HomeState extends State<Home> {
                           labelText: 'Valor'),
                       keyboardType: TextInputType.numberWithOptions(),
                       controller: _valorController,
+                      
                       onChanged: (text) {
                         setState(() {
                           _novaOperacao.valor = text;
@@ -247,56 +251,93 @@ class _HomeState extends State<Home> {
   }
 
   Widget _movimentacao(BuildContext context, int index) {
-    return GestureDetector(
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Row(
-            children: <Widget>[
-              Column(
-                children: <Widget>[Icon(selecionaIcone(operacoes[index].tipo))],
-              ),
-              SizedBox(width: 55.0,),
-              Column(
-                children: <Widget>[
-                  Text(operacoes[index].tipo,
+    return Dismissible(
+      key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
+      background: Container(
+        color: Colors.red,
+        child: Align(
+          alignment: Alignment(0.8, 0.0),
+          child: Icon(
+            Icons.delete,
+            color: Colors.white,
+          ),
+        ),
+      ),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) {
+        apagaOperacao(index);
+
+        final snack = SnackBar(
+          content: Text("Operação Removida!"),
+          action: SnackBarAction(
+            label: "Desfazer",
+            onPressed: () {
+              helper.saveOperacao(_operacaoRemoved);
+              _getOperacoes(_selectedIndex);
+            },
+          ),
+          duration: Duration(seconds: 2),
+        );
+
+        Scaffold.of(context).showSnackBar(snack);
+      },
+      child: GestureDetector(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Row(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Icon(selecionaIcone(operacoes[index].tipo))
+                  ],
+                ),
+                SizedBox(
+                  width: 55.0,
+                ),
+                Column(
+                  children: <Widget>[
+                    Text(operacoes[index].tipo,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            fontSize: 15.0, fontWeight: FontWeight.bold)),
+                    Text("R\$" + operacoes[index].valor,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          fontSize: 15.0,
+                        )),
+                    Text(
+                      formatDate(DateTime.now(), [
+                        dd,
+                        '/',
+                        mm,
+                        '/',
+                        yyyy,
+                        ' ',
+                        HH,
+                        ':',
+                        nn
+                      ]).toString(),
                       textAlign: TextAlign.start,
-                      style: TextStyle(
-                          fontSize: 15.0, fontWeight: FontWeight.bold)),
-                  Text("R\$" + operacoes[index].valor,
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        fontSize: 15.0,
-                      )),
-                  Text(
-                    formatDate(DateTime.now(),
-                        [dd, '/', mm, '/', yyyy, ' ', HH, ':', nn]).toString(),
-                    textAlign: TextAlign.start,
-                  ),
-                ],
-              ),
-              SizedBox(width: 50.0,),
-              Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: IconButton(
-                      icon: Icon(Icons.delete),
-                      color: Colors.red,
-                      onPressed:() async { 
-                        await helper.deleteOperacao(operacoes[index].id);
-                        print("Deletado operação id:" + operacoes[index].id.toString());
-                        _getOperacoes(_selectedIndex);
-                        },
                     ),
-                  )
-                ],
-              )
-            ],
+                  ],
+                ),
+                SizedBox(
+                  width: 50.0,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  apagaOperacao(int index) async {
+    _operacaoRemoved = operacoes[index];
+    await helper.deleteOperacao(operacoes[index].id);
+    print("Deletado operação id:" + operacoes[index].id.toString());
+    _getOperacoes(_selectedIndex);
   }
 
   IconData selecionaIcone(String tipo) {
@@ -316,7 +357,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-void _getOperacoes(int tipo) {
+  void _getOperacoes(int tipo) {
     switch (tipo) {
       case 0:
         _getAllOperacoes();
@@ -369,11 +410,12 @@ void _getOperacoes(int tipo) {
     double _total = 0;
     for (int i = 0; i < operacoes.length; i++) {
       print(operacoes[i].valor);
-     _total += double.parse(operacoes[i].valor);
+      _total += double.parse(operacoes[i].valor);
+    }
+    if (operacoes.length == 0) _total = 0;
 
-     setState(() {
+    setState(() {
       _valorTotal = _total.toString();
-     });
-     }
+    });
   }
 }
