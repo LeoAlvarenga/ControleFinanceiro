@@ -62,11 +62,11 @@ class OperacaoHelper {
     return await dbOperacao.delete(operacoesTable, where: "$idColumn = ?", whereArgs: [id]);
   }
 
-  Future<int> updateOperacao(Operacao Operacao) async {
+  Future<int> updateOperacao(Operacao operacao) async {
     Database dbOperacao = await db;
     return await dbOperacao.update(operacoesTable, 
-      Operacao.toMap(), 
-      where: "$idColumn= ?", whereArgs: [Operacao.id]);
+      operacao.toMap(), 
+      where: "$idColumn= ?", whereArgs: [operacao.id]);
   }
 
   Future<List> getAllOperacoes() async {
@@ -98,12 +98,7 @@ class OperacaoHelper {
     Database dbOperacao = await db;
     dbOperacao.close();
   }
-  
-  Future<String> getPath() async {
-    
-    //final path = await getDatabasesPath();
-    //return path;
-  }
+ 
 }
 
 class Operacao {

@@ -158,9 +158,7 @@ class _HomeState extends State<Home> {
   }
 
   createDialog(BuildContext context, String tipo) {
-    String selectedType;
     var _formKey = GlobalKey<FormState>();
-    var _tipos = <String>['Crédito', 'Débito', 'Saque'];
 
     final _valorController = TextEditingController();
     final _observacaoController = TextEditingController();
