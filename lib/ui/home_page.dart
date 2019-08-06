@@ -1,6 +1,7 @@
 import 'package:controle_financeiro/helpers/operacao_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -92,14 +93,42 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepPurple,
-        child: Icon(Icons.add),
-        onPressed: () {
-          createDialog(context);
-          _getOperacoes(_selectedIndex);
-        },
-      ),
+      floatingActionButton: SpeedDial(
+          // both default to 16
+          marginRight: 18,
+          marginBottom: 20,
+          child: Icon(Icons.add),
+          backgroundColor: Colors.deepPurple,          
+          children: [
+            SpeedDialChild(
+              child: Icon(Icons.payment),
+              backgroundColor: Colors.deepPurple,
+              label: 'Crédito',
+              labelStyle: TextStyle(fontSize: 18.0),
+              onTap: (){
+                createDialog(context, "Crédito");
+              }
+            ),
+            SpeedDialChild(
+              child: Icon(Icons.local_atm),
+              backgroundColor: Colors.deepPurple,
+              label: 'Débito',
+              labelStyle: TextStyle(fontSize: 18.0),
+              onTap: (){
+                createDialog(context, "Débito");
+              }
+            ),
+            SpeedDialChild(
+              child: Icon(Icons.account_balance_wallet),
+              backgroundColor: Colors.deepPurple,
+              label: 'Saque',
+              labelStyle: TextStyle(fontSize: 18.0),
+              onTap: (){
+                createDialog(context, "Saque");
+              }
+            ),
+          ],
+        ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -128,10 +157,9 @@ class _HomeState extends State<Home> {
     );
   }
 
-  createDialog(BuildContext context) {
+  createDialog(BuildContext context, String tipo) {
     String selectedType;
     var _formKey = GlobalKey<FormState>();
-    var dropValue = "teste";
     var _tipos = <String>['Crédito', 'Débito', 'Saque'];
 
     final _valorController = TextEditingController();
@@ -144,7 +172,7 @@ class _HomeState extends State<Home> {
         builder: (context) {
           return AlertDialog(
               title: Text(
-                'Novo Movimento',
+                'Adcionar $tipo',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: Colors.deepPurple,
@@ -157,32 +185,6 @@ class _HomeState extends State<Home> {
                 child: ListView(
                   padding: EdgeInsets.all(10.0),
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(0.0, 0.0, 5.0, 0.0),
-                          child: Icon(Icons.scatter_plot),
-                        ),
-                        DropdownButton(
-                          value: selectedType,
-                          items: _tipos
-                              .map((value) => DropdownMenuItem(
-                                    child: Text(value),
-                                    value: value,
-                                  ))
-                              .toList(),
-                          onChanged: (selected) {
-                            print(selected);
-                            setState(() {
-                              selectedType = selected;
-                              _novaOperacao.tipo = selected;
-                            });
-                          },
-                          hint: Text("Selecione o Tipo"),
-                          
-                        ),
-                      ],
-                    ),
                     TextField(
                       decoration: InputDecoration(
                           icon: Icon(Icons.monetization_on),
@@ -212,6 +214,7 @@ class _HomeState extends State<Home> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0)),
                           onPressed: () async {
+                            _novaOperacao.tipo = tipo;
                             await helper.saveOperacao(_novaOperacao);
                             print("Operacao salva");
                             _getOperacoes(_selectedIndex);
