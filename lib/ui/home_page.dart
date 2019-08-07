@@ -66,6 +66,20 @@ class _HomeState extends State<Home> {
         title: Text("Controle Financeiro"),
         centerTitle: true,
         backgroundColor: Colors.deepPurple,
+        actions: <Widget>[
+          // IconButton(
+          //   icon: Icon(Icons.more_vert, color: Colors.white,),
+          //   onPressed: () {
+          PopupMenuButton<AppBarActions>(
+            itemBuilder: (context) => <PopupMenuEntry<AppBarActions>>[
+              PopupMenuItem(
+                value: AppBarActions.apagaTudo,
+                child: Text("Apagar Tudo"),
+              )
+            ],
+            onSelected: _appBarActions,
+          )
+        ],
       ),
       body: Column(
         children: <Widget>[
@@ -211,7 +225,7 @@ class _HomeState extends State<Home> {
                     ),
                     DateTimePickerFormField(
                       inputType: InputType.date,
-                      format:  DateFormat("dd-MM-yyyy"),
+                      format: DateFormat("dd-MM-yyyy"),
                       initialDate: DateTime(2019),
                       editable: false,
                       decoration: InputDecoration(
@@ -219,16 +233,17 @@ class _HomeState extends State<Home> {
                         icon: Icon(Icons.date_range, color: Colors.deepPurple),
                         hasFloatingPlaceholder: false,
                       ),
-                      validator: (value){
-                        if(value == null) {
+                      validator: (value) {
+                        if (value == null) {
                           return "selecione uma Data";
                         } else {
                           return null;
                         }
                       },
-                      onChanged: (dt){
+                      onChanged: (dt) {
                         setState(() {
-                         _novaOperacao.data = formatDate(dt, [dd,"/",mm,"/",yyyy]); 
+                          _novaOperacao.data =
+                              formatDate(dt, [dd, "/", mm, "/", yyyy]);
                         });
                         print(_novaOperacao.data);
                       },
@@ -241,7 +256,8 @@ class _HomeState extends State<Home> {
                           onPressed: () async {
                             if (_formKey.currentState.validate()) {
                               _novaOperacao.valor = _valorController.text;
-                              _novaOperacao.observacao = _observacaoController.text;
+                              _novaOperacao.observacao =
+                                  _observacaoController.text;
                               _novaOperacao.tipo = tipo;
                               await helper.saveOperacao(_novaOperacao);
                               print("Operacao salva");
@@ -309,7 +325,10 @@ class _HomeState extends State<Home> {
               children: <Widget>[
                 Column(
                   children: <Widget>[
-                    Icon(selecionaIcone(operacoes[index].tipo))
+                    Icon(
+                      selecionaIcone(operacoes[index].tipo),
+                      size: 35,
+                    )
                   ],
                 ),
                 SizedBox(
@@ -328,7 +347,9 @@ class _HomeState extends State<Home> {
                         style: TextStyle(
                           fontSize: 15.0,
                         )),
-                    Text(operacoes[index].data, textAlign: TextAlign.start,
+                    Text(
+                      operacoes[index].data,
+                      textAlign: TextAlign.start,
                     ),
                   ],
                 ),
@@ -343,11 +364,68 @@ class _HomeState extends State<Home> {
     );
   }
 
+  _appBarActions(AppBarActions selecionado) {
+    switch (selecionado) {
+      case AppBarActions.apagaTudo:
+        print("apagatudo selecionado");
+        return apagaDialog();
+        break;
+      default:
+        return null;
+        break;
+    }
+  }
+
   apagaOperacao(int index) async {
     _operacaoRemoved = operacoes[index];
     await helper.deleteOperacao(operacoes[index].id);
     print("Deletado operação id:" + operacoes[index].id.toString());
     _getOperacoes(_selectedIndex);
+  }
+
+  apagaDialog() async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Apagar Tudo?"),
+            content: Row(
+              children: <Widget>[
+                Icon(
+                  Icons.delete_forever,
+                  size: 60,
+                  color: Colors.red,
+                ),
+                Flexible(
+                    child:
+                      Text("Estes dados serão apagados permanentemente"),
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              MaterialButton(
+                child: Text("Cancelar",
+                    style: TextStyle(color: Colors.blueAccent)),
+                onPressed: () => Navigator.pop(context),
+              ),
+              MaterialButton(
+                child: Text("Apagar", style: TextStyle(color: Colors.red)),
+                onPressed: () {
+                  apagaTudo();
+                  Navigator.pop(context);
+                }
+              )
+            ],
+          );
+        });
+  }
+
+  apagaTudo() {
+    for (int i = 0; i < operacoes.length; i++) {
+      apagaOperacao(i);
+    }
+    print("Todas  operações apagadas");
   }
 
   IconData selecionaIcone(String tipo) {
@@ -429,3 +507,5 @@ class _HomeState extends State<Home> {
     });
   }
 }
+
+enum AppBarActions { apagaTudo }
