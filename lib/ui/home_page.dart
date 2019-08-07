@@ -1,4 +1,6 @@
 import 'package:controle_financeiro/helpers/operacao_helper.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -176,11 +178,12 @@ class _HomeState extends State<Home> {
               ),
               content: Form(
                 key: _formKey,
-                autovalidate: true,
+                autovalidate: false,
                 child: ListView(
                   padding: EdgeInsets.all(10.0),
                   children: <Widget>[
                     TextFormField(
+                      inputFormatters: [],
                       decoration: InputDecoration(
                           icon: Icon(Icons.monetization_on,
                               color: Colors.deepPurple),
@@ -205,12 +208,29 @@ class _HomeState extends State<Home> {
                           hoverColor: Colors.deepPurple),
                       controller: _observacaoController,
                       cursorColor: Colors.deepPurple,
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return "Preenchimento Obrigatório!";
+                    ),
+                    DateTimePickerFormField(
+                      inputType: InputType.date,
+                      format:  DateFormat("dd-MM-yyyy"),
+                      initialDate: DateTime(2019),
+                      editable: false,
+                      decoration: InputDecoration(
+                        hoverColor: Colors.deepPurple,
+                        icon: Icon(Icons.date_range, color: Colors.deepPurple),
+                        hasFloatingPlaceholder: false,
+                      ),
+                      validator: (value){
+                        if(value == null) {
+                          return "selecione uma Data";
                         } else {
                           return null;
                         }
+                      },
+                      onChanged: (dt){
+                        setState(() {
+                         _novaOperacao.data = formatDate(dt, [dd,"/",mm,"/",yyyy]); 
+                        });
+                        print(_novaOperacao.data);
                       },
                     ),
                     Column(
@@ -221,8 +241,7 @@ class _HomeState extends State<Home> {
                           onPressed: () async {
                             if (_formKey.currentState.validate()) {
                               _novaOperacao.valor = _valorController.text;
-                              _novaOperacao.observacao =
-                                  _observacaoController.text;
+                              _novaOperacao.observacao = _observacaoController.text;
                               _novaOperacao.tipo = tipo;
                               await helper.saveOperacao(_novaOperacao);
                               print("Operacao salva");
@@ -309,19 +328,7 @@ class _HomeState extends State<Home> {
                         style: TextStyle(
                           fontSize: 15.0,
                         )),
-                    Text(
-                      formatDate(DateTime.now(), [
-                        dd,
-                        '/',
-                        mm,
-                        '/',
-                        yyyy,
-                        ' ',
-                        HH,
-                        ':',
-                        nn
-                      ]).toString(),
-                      textAlign: TextAlign.start,
+                    Text(operacoes[index].data, textAlign: TextAlign.start,
                     ),
                   ],
                 ),
