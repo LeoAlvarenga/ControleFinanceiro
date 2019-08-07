@@ -180,24 +180,37 @@ class _HomeState extends State<Home> {
                 child: ListView(
                   padding: EdgeInsets.all(10.0),
                   children: <Widget>[
-                    TextField(
+                    TextFormField(
                       decoration: InputDecoration(
-                          icon: Icon(Icons.monetization_on),
+                          icon: Icon(Icons.monetization_on,
+                              color: Colors.deepPurple),
                           labelText: 'Valor'),
                       keyboardType: TextInputType.numberWithOptions(),
                       controller: _valorController,
-                      onChanged: (text) {
-                        setState(() {
-                          _novaOperacao.valor = text;
-                        });
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Preenchimento Obrigatório!";
+                        } else {
+                          return null;
+                        }
                       },
                     ),
-                    TextField(
+                    TextFormField(
                       decoration: InputDecoration(
-                          icon: Icon(Icons.report), labelText: 'Observação'),
+                          icon: Icon(
+                            Icons.report,
+                            color: Colors.deepPurple,
+                          ),
+                          labelText: 'Observação',
+                          hoverColor: Colors.deepPurple),
                       controller: _observacaoController,
-                      onChanged: (text) {
-                        _novaOperacao.observacao = text;
+                      cursorColor: Colors.deepPurple,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Preenchimento Obrigatório!";
+                        } else {
+                          return null;
+                        }
                       },
                     ),
                     Column(
@@ -206,11 +219,16 @@ class _HomeState extends State<Home> {
                         const SizedBox(height: 30),
                         MaterialButton(
                           onPressed: () async {
-                            _novaOperacao.tipo = tipo;
-                            await helper.saveOperacao(_novaOperacao);
-                            print("Operacao salva");
-                            _getOperacoes(_selectedIndex);
-                            Navigator.pop(context);
+                            if (_formKey.currentState.validate()) {
+                              _novaOperacao.valor = _valorController.text;
+                              _novaOperacao.observacao =
+                                  _observacaoController.text;
+                              _novaOperacao.tipo = tipo;
+                              await helper.saveOperacao(_novaOperacao);
+                              print("Operacao salva");
+                              _getOperacoes(_selectedIndex);
+                              Navigator.pop(context);
+                            }
                           },
                           child: Text(
                             "Salvar",
@@ -280,10 +298,12 @@ class _HomeState extends State<Home> {
                 ),
                 Column(
                   children: <Widget>[
-                    Text(operacoes[index].tipo,
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 15.0, fontWeight: FontWeight.bold)),
+                    Text(
+                      operacoes[index].tipo,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.bold),
+                    ),
                     Text("R\$" + operacoes[index].valor,
                         textAlign: TextAlign.start,
                         style: TextStyle(
@@ -344,6 +364,7 @@ class _HomeState extends State<Home> {
     switch (tipo) {
       case 0:
         _getAllOperacoes();
+        helper.deleteOperacao(7);
         break;
       case 1:
         _getSelectedOperacoes("Crédito");
@@ -396,7 +417,6 @@ class _HomeState extends State<Home> {
       _total += double.parse(operacoes[i].valor);
     }
     if (operacoes.length == 0) _total = 0;
-
     setState(() {
       _valorTotal = _total.toString();
     });
