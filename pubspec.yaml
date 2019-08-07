@@ -27,6 +27,7 @@ dependencies:
   sqflite: ^1.1.5
   flutter_speed_dial: ^1.2.1
   datetime_picker_formfield: ^0.1.1
+  flutter_launcher_icons: ^0.7.2+1
 
 dev_dependencies:
   flutter_test:
@@ -74,3 +75,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "icon\\icone.png"

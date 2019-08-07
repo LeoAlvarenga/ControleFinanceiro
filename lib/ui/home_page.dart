@@ -182,107 +182,101 @@ class _HomeState extends State<Home> {
         context: context,
         builder: (context) {
           return AlertDialog(
-              title: Text(
-                'Adcionar $tipo',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.deepPurple,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25.0),
-              ),
-              content: Form(
-                key: _formKey,
-                autovalidate: false,
-                child: ListView(
-                  padding: EdgeInsets.all(10.0),
-                  children: <Widget>[
-                    TextFormField(
-                      inputFormatters: [],
-                      decoration: InputDecoration(
-                          icon: Icon(Icons.monetization_on,
-                              color: Colors.deepPurple),
-                          labelText: 'Valor'),
-                      keyboardType: TextInputType.numberWithOptions(),
-                      controller: _valorController,
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return "Preenchimento Obrigatório!";
-                        } else {
-                          return null;
-                        }
-                      },
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                          icon: Icon(
-                            Icons.report,
-                            color: Colors.deepPurple,
-                          ),
-                          labelText: 'Observação',
-                          hoverColor: Colors.deepPurple),
-                      controller: _observacaoController,
-                      cursorColor: Colors.deepPurple,
-                    ),
-                    DateTimePickerFormField(
-                      inputType: InputType.date,
-                      format: DateFormat("dd-MM-yyyy"),
-                      initialDate: DateTime(2019),
-                      editable: false,
-                      decoration: InputDecoration(
-                        hoverColor: Colors.deepPurple,
-                        icon: Icon(Icons.date_range, color: Colors.deepPurple),
-                        hasFloatingPlaceholder: false,
-                      ),
-                      validator: (value) {
-                        if (value == null) {
-                          return "selecione uma Data";
-                        } else {
-                          return null;
-                        }
-                      },
-                      onChanged: (dt) {
-                        setState(() {
-                          _novaOperacao.data =
-                              formatDate(dt, [dd, "/", mm, "/", yyyy]);
-                        });
-                        print(_novaOperacao.data);
-                      },
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        const SizedBox(height: 30),
-                        MaterialButton(
-                          onPressed: () async {
-                            if (_formKey.currentState.validate()) {
-                              _novaOperacao.valor = _valorController.text;
-                              _novaOperacao.observacao =
-                                  _observacaoController.text;
-                              _novaOperacao.tipo = tipo;
-                              await helper.saveOperacao(_novaOperacao);
-                              print("Operacao salva");
-                              _getOperacoes(_selectedIndex);
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Text(
-                            "Salvar",
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 20),
+            title: Text(
+              'Adcionar $tipo',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.deepPurple,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 25.0),
+            ),
+            content: Form(
+              key: _formKey,
+              autovalidate: false,
+              child: ListView(
+                padding: EdgeInsets.all(10.0),
+                children: <Widget>[
+                  TextFormField(
+                    inputFormatters: [],
+                    decoration: InputDecoration(
+                        icon: Icon(Icons.monetization_on,
+                            color: Colors.deepPurple),
+                        labelText: 'Valor'),
+                    keyboardType: TextInputType.numberWithOptions(),
+                    controller: _valorController,
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Preenchimento Obrigatório!";
+                      } else {
+                        return null;
+                      }
+                    },
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        icon: Icon(
+                          Icons.report,
                           color: Colors.deepPurple,
-                          splashColor: Colors.deepPurpleAccent,
-                          elevation: 6,
-                          highlightElevation: 2,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
                         ),
-                      ],
+                        labelText: 'Observação',
+                        hoverColor: Colors.deepPurple),
+                    controller: _observacaoController,
+                    cursorColor: Colors.deepPurple,
+                  ),
+                  DateTimePickerFormField(
+                    inputType: InputType.date,
+                    format: DateFormat("dd-MM-yyyy"),
+                    initialDate: DateTime(2019),
+                    editable: false,
+                    decoration: InputDecoration(
+                      hoverColor: Colors.deepPurple,
+                      icon: Icon(Icons.date_range, color: Colors.deepPurple),
+                      hasFloatingPlaceholder: false,
                     ),
-                  ],
-                ),
-              ));
+                    validator: (value) {
+                      if (value == null) {
+                        return "selecione uma Data";
+                      } else {
+                        return null;
+                      }
+                    },
+                    onChanged: (dt) {
+                      setState(() {
+                        _novaOperacao.data =
+                            formatDate(dt, [dd, "/", mm, "/", yyyy]);
+                      });
+                      print(_novaOperacao.data);
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                  MaterialButton(
+                    onPressed: () async {
+                      if (_formKey.currentState.validate()) {
+                        _novaOperacao.valor = _valorController.text;
+                        _novaOperacao.observacao = _observacaoController.text;
+                        _novaOperacao.tipo = tipo;
+                        await helper.saveOperacao(_novaOperacao);
+                        print("Operacao salva");
+                        _getOperacoes(_selectedIndex);
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text(
+                      "Salvar",
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    color: Colors.deepPurple,
+                    splashColor: Colors.deepPurpleAccent,
+                    elevation: 6,
+                    highlightElevation: 2,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                  ),
+                ],
+              ),
+            ),
+          );
         });
   }
 
@@ -398,8 +392,7 @@ class _HomeState extends State<Home> {
                   color: Colors.red,
                 ),
                 Flexible(
-                    child:
-                      Text("Estes dados serão apagados permanentemente"),
+                  child: Text("Estes dados serão apagados permanentemente"),
                 ),
               ],
             ),
@@ -410,12 +403,11 @@ class _HomeState extends State<Home> {
                 onPressed: () => Navigator.pop(context),
               ),
               MaterialButton(
-                child: Text("Apagar", style: TextStyle(color: Colors.red)),
-                onPressed: () {
-                  apagaTudo();
-                  Navigator.pop(context);
-                }
-              )
+                  child: Text("Apagar", style: TextStyle(color: Colors.red)),
+                  onPressed: () {
+                    apagaTudo();
+                    Navigator.pop(context);
+                  })
             ],
           );
         });
