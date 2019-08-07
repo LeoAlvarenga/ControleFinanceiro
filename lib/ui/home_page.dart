@@ -94,41 +94,38 @@ class _HomeState extends State<Home> {
         ],
       ),
       floatingActionButton: SpeedDial(
-          // both default to 16
-          marginRight: 18,
-          marginBottom: 20,
-          child: Icon(Icons.add),
-          backgroundColor: Colors.deepPurple,          
-          children: [
-            SpeedDialChild(
+        // both default to 16
+        marginRight: 18,
+        marginBottom: 20,
+        child: Icon(Icons.add),
+        backgroundColor: Colors.deepPurple,
+        children: [
+          SpeedDialChild(
               child: Icon(Icons.payment),
               backgroundColor: Colors.deepPurple,
               label: 'Crédito',
               labelStyle: TextStyle(fontSize: 18.0),
-              onTap: (){
+              onTap: () {
                 createDialog(context, "Crédito");
-              }
-            ),
-            SpeedDialChild(
+              }),
+          SpeedDialChild(
               child: Icon(Icons.local_atm),
               backgroundColor: Colors.deepPurple,
               label: 'Débito',
               labelStyle: TextStyle(fontSize: 18.0),
-              onTap: (){
+              onTap: () {
                 createDialog(context, "Débito");
-              }
-            ),
-            SpeedDialChild(
+              }),
+          SpeedDialChild(
               child: Icon(Icons.account_balance_wallet),
               backgroundColor: Colors.deepPurple,
               label: 'Saque',
               labelStyle: TextStyle(fontSize: 18.0),
-              onTap: (){
+              onTap: () {
                 createDialog(context, "Saque");
-              }
-            ),
-          ],
-        ),
+              }),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -189,7 +186,6 @@ class _HomeState extends State<Home> {
                           labelText: 'Valor'),
                       keyboardType: TextInputType.numberWithOptions(),
                       controller: _valorController,
-                      
                       onChanged: (text) {
                         setState(() {
                           _novaOperacao.valor = text;
@@ -208,9 +204,7 @@ class _HomeState extends State<Home> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         const SizedBox(height: 30),
-                        RaisedButton(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0)),
+                        MaterialButton(
                           onPressed: () async {
                             _novaOperacao.tipo = tipo;
                             await helper.saveOperacao(_novaOperacao);
@@ -218,31 +212,19 @@ class _HomeState extends State<Home> {
                             _getOperacoes(_selectedIndex);
                             Navigator.pop(context);
                           },
-                          textColor: Colors.white,
-                          padding: const EdgeInsets.all(0.0),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: <Color>[
-                                  Colors.deepPurple,
-                                  Colors.deepPurpleAccent,
-                                  Colors.deepPurple,
-                                ],
-                              ),
-                            ),
-                            padding: const EdgeInsets.all(18.0),
-                            child: const Text('Salvar',
-                                style: TextStyle(fontSize: 20)),
+                          child: Text(
+                            "Salvar",
+                            style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          color: Colors.deepPurple,
+                          splashColor: Colors.deepPurpleAccent,
+                          elevation: 6,
+                          highlightElevation: 2,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
                         ),
-                        OutlineButton(
-                            child: new Text("Button text"),
-                            onPressed: () async {
-                              await helper.saveOperacao(_novaOperacao);
-                              print("Operacao salva");
-                            },
-                            shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(30.0)))
                       ],
                     ),
                   ],
