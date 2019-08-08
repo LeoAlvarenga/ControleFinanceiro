@@ -84,24 +84,27 @@ class _HomeState extends State<Home> {
       body: Column(
         children: <Widget>[
           Card(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    "Total Gasto:",
-                    style: TextStyle(fontSize: 20.0, color: Colors.white),
-                    textAlign: TextAlign.start,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      "Total Gasto:",
+                      style: TextStyle(fontSize: 20.0, color: Colors.white),
+                      textAlign: TextAlign.start,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Text(
-                    "R\$"+_valorTotal,
-                    style: TextStyle(fontSize: 20.0, color: Colors.white),
-                    textAlign: TextAlign.end,
-                  ),
-                )
-              ],
+                  Expanded(
+                    child: Text(
+                      "R\$" + _valorTotal,
+                      style: TextStyle(fontSize: 20.0, color: Colors.white),
+                      textAlign: TextAlign.end,
+                    ),
+                  )
+                ],
+              ),
             ),
             color: alertaDeCorTotalGasto(double.parse(_valorTotal)),
           ),
