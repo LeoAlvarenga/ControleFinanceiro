@@ -13,7 +13,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   OperacaoHelper helper = OperacaoHelper();
 
-  List<Operacao> operacoes = List();
+  List<Operacao> movimentacoes = List();
 
   Operacao _operacaoRemoved = Operacao();
 
@@ -27,7 +27,7 @@ class _HomeState extends State<Home> {
 
     _getOperacoes(_selectedIndex);
 
-    print(operacoes);
+    print(movimentacoes);
   }
 
   //configurações do BottomNavigator
@@ -103,7 +103,7 @@ class _HomeState extends State<Home> {
                 itemBuilder: (context, index) {
                   return _movimentacao(context, index);
                 },
-                itemCount: operacoes.length,
+                itemCount: movimentacoes.length,
               ),
             ),
           ),
@@ -215,7 +215,7 @@ class _HomeState extends State<Home> {
                   TextFormField(
                     decoration: InputDecoration(
                         icon: Icon(
-                          Icons.report,
+                          Icons.info_outline,
                           color: Colors.deepPurple,
                         ),
                         labelText: 'Observação',
@@ -226,7 +226,7 @@ class _HomeState extends State<Home> {
                   DateTimePickerFormField(
                     inputType: InputType.date,
                     format: DateFormat("dd-MM-yyyy"),
-                    initialDate: DateTime(2019),
+                    initialDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
                     editable: false,
                     decoration: InputDecoration(
                       hoverColor: Colors.deepPurple,
@@ -317,45 +317,85 @@ class _HomeState extends State<Home> {
             padding: EdgeInsets.all(10.0),
             child: Row(
               children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    Icon(
-                      selecionaIcone(operacoes[index].tipo),
-                      size: 35,
-                    )
-                  ],
+                Expanded(
+                  child: 
+                  Icon(
+                    selecionaIcone(movimentacoes[index].tipo),
+                    size: 40,
+                    color: Colors.deepPurple,
+                  ),
                 ),
-                SizedBox(
-                  width: 55.0,
-                ),
-                Column(
-                  children: <Widget>[
-                    Text(
-                      operacoes[index].tipo,
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                          fontSize: 15.0, fontWeight: FontWeight.bold),
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          movimentacoes[index].tipo,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        Text(
+                          movimentacoes[index].data,
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ],
                     ),
-                    Text("R\$" + operacoes[index].valor,
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontSize: 15.0,
-                        )),
-                    Text(
-                      operacoes[index].data,
-                      textAlign: TextAlign.start,
-                    ),
-                  ],
+                  ),
                 ),
-                SizedBox(
-                  width: 50.0,
-                ),
+                Expanded(
+                  child: Text(
+                    "R\$" + movimentacoes[index].valor,
+                    style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.end,
+                  ),
+                )
               ],
             ),
           ),
         ),
+        onTap: () {
+          observacaoDialog(movimentacoes[index].observacao);
+        },
       ),
     );
+  }
+
+  observacaoDialog(String observacao) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Observação da Operação"),
+            content: Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.info_outline,
+                    size: 55,
+                    color: Colors.deepPurple,
+                  ),
+                  Flexible(
+                      child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      observacao,
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ))
+                ],
+              ),
+            actions: <Widget>[
+              MaterialButton(
+                  child: Icon(
+                    Icons.check,
+                    color: Colors.blue,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  }),
+            ],
+          );
+        });
   }
 
   _appBarActions(AppBarActions selecionado) {
@@ -371,9 +411,9 @@ class _HomeState extends State<Home> {
   }
 
   apagaOperacao(int index) async {
-    _operacaoRemoved = operacoes[index];
-    await helper.deleteOperacao(operacoes[index].id);
-    print("Deletado operação id:" + operacoes[index].id.toString());
+    _operacaoRemoved = movimentacoes[index];
+    await helper.deleteOperacao(movimentacoes[index].id);
+    print("Deletado operação id:" + movimentacoes[index].id.toString());
     _getOperacoes(_selectedIndex);
   }
 
@@ -414,7 +454,7 @@ class _HomeState extends State<Home> {
   }
 
   apagaTudo() {
-    for (int i = 0; i < operacoes.length; i++) {
+    for (int i = 0; i < movimentacoes.length; i++) {
       apagaOperacao(i);
     }
     print("Todas  operações apagadas");
@@ -461,9 +501,9 @@ class _HomeState extends State<Home> {
   void _getAllOperacoes() {
     helper.getAllOperacoes().then((list) {
       setState(() {
-        operacoes = list;
+        movimentacoes = list;
         atualizaValor();
-        print(operacoes);
+        print(movimentacoes);
       });
     });
   }
@@ -471,7 +511,7 @@ class _HomeState extends State<Home> {
   void _getSelectedOperacoes(String tipoSelecionado) {
     helper.getSelectedOperacoes(tipoSelecionado).then((list) {
       setState(() {
-        operacoes = list;
+        movimentacoes = list;
         atualizaValor();
       });
     });
@@ -489,11 +529,11 @@ class _HomeState extends State<Home> {
 
   atualizaValor() {
     double _total = 0;
-    for (int i = 0; i < operacoes.length; i++) {
-      print(operacoes[i].valor);
-      _total += double.parse(operacoes[i].valor);
+    for (int i = 0; i < movimentacoes.length; i++) {
+      print(movimentacoes[i].valor);
+      _total += double.parse(movimentacoes[i].valor);
     }
-    if (operacoes.length == 0) _total = 0;
+    if (movimentacoes.length == 0) _total = 0;
     setState(() {
       _valorTotal = _total.toString();
     });
