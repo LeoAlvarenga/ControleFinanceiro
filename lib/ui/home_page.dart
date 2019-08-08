@@ -87,14 +87,23 @@ class _HomeState extends State<Home> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(
-                  "Total Gasto: R\$" + _valorTotal /*+ totalGasto()*/,
-                  style: TextStyle(fontSize: 20.0, color: Colors.white),
-                  textAlign: TextAlign.center,
+                Expanded(
+                  child: Text(
+                    "Total Gasto:",
+                    style: TextStyle(fontSize: 20.0, color: Colors.white),
+                    textAlign: TextAlign.start,
+                  ),
                 ),
+                Expanded(
+                  child: Text(
+                    "R\$"+_valorTotal,
+                    style: TextStyle(fontSize: 20.0, color: Colors.white),
+                    textAlign: TextAlign.end,
+                  ),
+                )
               ],
             ),
-            color: Colors.deepPurple,
+            color: alertaDeCorTotalGasto(double.parse(_valorTotal)),
           ),
           Expanded(
             child: Padding(
@@ -226,7 +235,8 @@ class _HomeState extends State<Home> {
                   DateTimePickerFormField(
                     inputType: InputType.date,
                     format: DateFormat("dd-MM-yyyy"),
-                    initialDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day),
+                    initialDate: DateTime(DateTime.now().year,
+                        DateTime.now().month, DateTime.now().day),
                     editable: false,
                     decoration: InputDecoration(
                       hoverColor: Colors.deepPurple,
@@ -318,8 +328,7 @@ class _HomeState extends State<Home> {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: 
-                  Icon(
+                  child: Icon(
                     selecionaIcone(movimentacoes[index].tipo),
                     size: 40,
                     color: Colors.deepPurple,
@@ -367,22 +376,22 @@ class _HomeState extends State<Home> {
           return AlertDialog(
             title: Text("Observação da Operação"),
             content: Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.info_outline,
-                    size: 55,
-                    color: Colors.deepPurple,
+              children: <Widget>[
+                Icon(
+                  Icons.info_outline,
+                  size: 55,
+                  color: Colors.deepPurple,
+                ),
+                Flexible(
+                    child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    observacao,
+                    style: TextStyle(fontSize: 20),
                   ),
-                  Flexible(
-                      child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      observacao,
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ))
-                ],
-              ),
+                ))
+              ],
+            ),
             actions: <Widget>[
               MaterialButton(
                   child: Icon(
@@ -537,6 +546,14 @@ class _HomeState extends State<Home> {
     setState(() {
       _valorTotal = _total.toString();
     });
+  }
+
+  alertaDeCorTotalGasto(double valor) {
+    if (valor <= 500) {
+      return Colors.green;
+    } else {
+      return Colors.red;
+    }
   }
 }
 
