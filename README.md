@@ -1,7 +1,6 @@
 # controle_financeiro
 
-A new Flutter project.
-
+Projeto de aplicativo para controle de finanças pessoais
 ## Getting Started
 
 This project is a starting point for a Flutter application.
