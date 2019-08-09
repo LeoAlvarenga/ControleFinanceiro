@@ -1,5 +1,6 @@
 import 'package:controle_financeiro/helpers/operacao_helper.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart';
@@ -18,6 +19,8 @@ class _HomeState extends State<Home> {
   Operacao _operacaoRemoved = Operacao();
 
   String _valorTotal = "0";
+
+  String _valorLimite = "500";
 
   int _selectedIndex = 0;
 
@@ -75,6 +78,10 @@ class _HomeState extends State<Home> {
               PopupMenuItem(
                 value: AppBarActions.apagaTudo,
                 child: Text("Apagar Tudo"),
+              ),
+              PopupMenuItem(
+                value: AppBarActions.configuracoes,
+                child: Text("Configurações"),
               )
             ],
             onSelected: _appBarActions,
@@ -209,7 +216,6 @@ class _HomeState extends State<Home> {
                 padding: EdgeInsets.all(10.0),
                 children: <Widget>[
                   TextFormField(
-                    inputFormatters: [],
                     decoration: InputDecoration(
                         icon: Icon(Icons.monetization_on,
                             color: Colors.deepPurple),
@@ -219,6 +225,8 @@ class _HomeState extends State<Home> {
                     validator: (value) {
                       if (value.isEmpty) {
                         return "Preenchimento Obrigatório!";
+                      } else if (double.tryParse(value) == null) {
+                        return '"$value" não é válido, use apenas números e "."';
                       } else {
                         return null;
                       }
@@ -416,10 +424,64 @@ class _HomeState extends State<Home> {
         print("apagatudo selecionado");
         return apagaDialog();
         break;
+      case AppBarActions.configuracoes:
+        print("configurações selecionado");
+        return configuracoesDialog();
+        break;
       default:
         return null;
         break;
     }
+  }
+
+  configuracoesDialog() {
+    final _valorController = TextEditingController();
+    _valorController.text = _valorLimite;
+    final _formKey = GlobalKey<FormState>();
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+      return AlertDialog(
+        title: Text("Configurações"),
+        content: Form(
+          key: _formKey,
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: "Valor Limite:",
+              labelStyle: TextStyle(color: Colors.deepPurple, fontSize: 20),
+            ),
+            //initialValue: _valorLimite,
+            controller: _valorController,
+            validator: (value){
+              if(value.isEmpty) {
+                return "Digite um valor";
+              } else if(double.tryParse(value) == Null) {
+                return "Valor Inválido, utilize apenas números e '.'";
+              } else {
+                return null;
+              }
+            },
+            keyboardType: TextInputType.number,
+          ),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.save),
+            color: Colors.deepPurple,
+            onPressed: (){
+              if(_formKey.currentState.validate()){
+                setState(() {
+                 _valorLimite =  _valorController.text;
+                });
+                print(_valorLimite);
+                Navigator.pop(context);
+              }
+            },
+          )
+        ],
+      );
+    });
   }
 
   apagaOperacao(int index) async {
@@ -552,7 +614,7 @@ class _HomeState extends State<Home> {
   }
 
   alertaDeCorTotalGasto(double valor) {
-    if (valor <= 500) {
+    if (valor <= double.parse(_valorLimite)) {
       return Colors.green;
     } else {
       return Colors.red;
@@ -560,4 +622,4 @@ class _HomeState extends State<Home> {
   }
 }
 
-enum AppBarActions { apagaTudo }
+enum AppBarActions { apagaTudo, configuracoes }
