@@ -339,34 +339,64 @@ class _HomeState extends State<Home> {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: Icon(
-                    selecionaIcone(movimentacoes[index].tipo),
-                    size: 40,
-                    color: Colors.deepPurple,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Icon(
+                        selecionaIcone(movimentacoes[index].tipo),
+                        size: 40,
+                        color: Colors.deepPurple,
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
-                  child: Center(
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          movimentacoes[index].tipo,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
-                        ),
-                        Text(
-                          movimentacoes[index].data,
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ],
-                    ),
+                  flex: 2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Tipo:",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Text(
+                        movimentacoes[index].tipo,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18,),
+                          textAlign: TextAlign.start,
+                      ),
+                      SizedBox(height: 10,),
+                      Text(
+                        "Data:",
+                        style: TextStyle(fontSize: 16),
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        movimentacoes[index].data,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.start,
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    "R\$" + movimentacoes[index].valor,
-                    style: TextStyle(fontSize: 18),
-                    textAlign: TextAlign.end,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Text(
+                        "valor:",
+                        style: TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        "R\$ " + movimentacoes[index].valor,
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.end,
+                      ),
+                    ],
                   ),
                 )
               ],
