@@ -1,10 +1,10 @@
 import 'package:controle_financeiro/helpers/operacao_helper.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -12,7 +12,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   OperacaoHelper helper = OperacaoHelper();
 
   List<Operacao> movimentacoes = List();
@@ -142,7 +141,7 @@ class _HomeState extends State<Home> {
               label: 'Crédito',
               labelStyle: TextStyle(fontSize: 18.0),
               onTap: () {
-                createDialog(context, "Crédito");
+                settingModalBottomSheet(context, "Crédito");
               }),
           SpeedDialChild(
               child: Icon(Icons.local_atm),
@@ -150,7 +149,7 @@ class _HomeState extends State<Home> {
               label: 'Débito',
               labelStyle: TextStyle(fontSize: 18.0),
               onTap: () {
-                createDialog(context, "Débito");
+                settingModalBottomSheet(context, "Débito");
               }),
           SpeedDialChild(
               child: Icon(Icons.account_balance_wallet),
@@ -158,7 +157,7 @@ class _HomeState extends State<Home> {
               label: 'Saque',
               labelStyle: TextStyle(fontSize: 18.0),
               onTap: () {
-                createDialog(context, "Saque");
+                settingModalBottomSheet(context, "Saque");
               }),
         ],
       ),
@@ -190,6 +189,119 @@ class _HomeState extends State<Home> {
     );
   }
 
+  settingModalBottomSheet(context, String tipo) {
+    var _formKey = GlobalKey<FormState>();
+
+    final _valorController = TextEditingController();
+    final _observacaoController = TextEditingController();
+
+    Operacao _novaOperacao = Operacao();
+
+    showModalBottomSheet(
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        builder: (BuildContext bc) {
+          return Container(
+            width: 200,
+            child: Form(
+              key: _formKey,
+              autovalidate: false,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(15,15,15,MediaQuery.of(context).viewInsets.bottom),
+                child: Wrap(
+                  runSpacing: 20,
+                  alignment: WrapAlignment.center,
+                  children: <Widget>[
+                    TextFormField(
+                      decoration: InputDecoration(
+                          icon: Icon(Icons.monetization_on,
+                              color: Colors.deepPurple),
+                          labelText: 'Valor'),
+                      keyboardType: TextInputType.numberWithOptions(),
+                      controller: _valorController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Preenchimento Obrigatório!";
+                        } else if (double.tryParse(value) == null) {
+                          return '"$value" não é válido, use apenas números e "."';
+                        } else {
+                          return null;
+                        }
+                      },
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                          icon: Icon(
+                            Icons.info_outline,
+                            color: Colors.deepPurple,
+                          ),
+                          labelText: 'Observação',
+                          hoverColor: Colors.deepPurple),
+                      controller: _observacaoController,
+                      cursorColor: Colors.deepPurple,
+                    ),
+                    DateTimePickerFormField(
+                      inputType: InputType.date,
+                      format: DateFormat("dd-MM-yyyy"),
+                      initialDate: DateTime(DateTime.now().year,
+                          DateTime.now().month, DateTime.now().day),
+                      editable: false,
+                      decoration: InputDecoration(
+                        hoverColor: Colors.deepPurple,
+                        icon: Icon(Icons.date_range, color: Colors.deepPurple),
+                        hasFloatingPlaceholder: false,
+                      ),
+                      validator: (value) {
+                        if (value == null) {
+                          return "selecione uma Data";
+                        } else {
+                          return null;
+                        }
+                      },
+                      onChanged: (dt) {
+                        setState(() {
+                          _novaOperacao.data =
+                              formatDate(dt, [dd, "/", mm, "/", yyyy]);
+                        });
+                        print(_novaOperacao.data);
+                      },
+                    ),
+                    const SizedBox(height: 30),
+                    MaterialButton(
+                      onPressed: () async {
+                        if (_formKey.currentState.validate()) {
+                          _novaOperacao.valor = _valorController.text;
+                          _novaOperacao.observacao = _observacaoController.text;
+                          _novaOperacao.tipo = tipo;
+                          await helper.saveOperacao(_novaOperacao);
+                          print("Operacao salva");
+                          _getOperacoes(_selectedIndex);
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: Text(
+                        "Salvar",
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      color: Colors.deepPurple,
+                      splashColor: Colors.deepPurpleAccent,
+                      elevation: 6,
+                      highlightElevation: 2,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   createDialog(BuildContext context, String tipo) {
     var _formKey = GlobalKey<FormState>();
 
@@ -202,103 +314,108 @@ class _HomeState extends State<Home> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text(
-              'Adcionar $tipo',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: Colors.deepPurple,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 25.0),
-            ),
-            content: Form(
-              key: _formKey,
-              autovalidate: false,
-              child: ListView(
-                padding: EdgeInsets.all(10.0),
-                children: <Widget>[
-                  TextFormField(
-                    decoration: InputDecoration(
-                        icon: Icon(Icons.monetization_on,
-                            color: Colors.deepPurple),
-                        labelText: 'Valor'),
-                    keyboardType: TextInputType.numberWithOptions(),
-                    controller: _valorController,
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return "Preenchimento Obrigatório!";
-                      } else if (double.tryParse(value) == null) {
-                        return '"$value" não é válido, use apenas números e "."';
-                      } else {
-                        return null;
-                      }
-                    },
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                        icon: Icon(
-                          Icons.info_outline,
-                          color: Colors.deepPurple,
-                        ),
-                        labelText: 'Observação',
-                        hoverColor: Colors.deepPurple),
-                    controller: _observacaoController,
-                    cursorColor: Colors.deepPurple,
-                  ),
-                  DateTimePickerFormField(
-                    inputType: InputType.date,
-                    format: DateFormat("dd-MM-yyyy"),
-                    initialDate: DateTime(DateTime.now().year,
-                        DateTime.now().month, DateTime.now().day),
-                    editable: false,
-                    decoration: InputDecoration(
-                      hoverColor: Colors.deepPurple,
-                      icon: Icon(Icons.date_range, color: Colors.deepPurple),
-                      hasFloatingPlaceholder: false,
-                    ),
-                    validator: (value) {
-                      if (value == null) {
-                        return "selecione uma Data";
-                      } else {
-                        return null;
-                      }
-                    },
-                    onChanged: (dt) {
-                      setState(() {
-                        _novaOperacao.data =
-                            formatDate(dt, [dd, "/", mm, "/", yyyy]);
-                      });
-                      print(_novaOperacao.data);
-                    },
-                  ),
-                  const SizedBox(height: 30),
-                  MaterialButton(
-                    onPressed: () async {
-                      if (_formKey.currentState.validate()) {
-                        _novaOperacao.valor = _valorController.text;
-                        _novaOperacao.observacao = _observacaoController.text;
-                        _novaOperacao.tipo = tipo;
-                        await helper.saveOperacao(_novaOperacao);
-                        print("Operacao salva");
-                        _getOperacoes(_selectedIndex);
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: Text(
-                      "Salvar",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              title: Text(
+                'Adcionar $tipo',
+                textAlign: TextAlign.center,
+                style: TextStyle(
                     color: Colors.deepPurple,
-                    splashColor: Colors.deepPurpleAccent,
-                    elevation: 6,
-                    highlightElevation: 2,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                  ),
-                ],
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25.0),
               ),
-            ),
-          );
+              content: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  autovalidate: false,
+                  child: ListView(
+                    padding: EdgeInsets.all(10.0),
+                    children: <Widget>[
+                      TextFormField(
+                        decoration: InputDecoration(
+                            icon: Icon(Icons.monetization_on,
+                                color: Colors.deepPurple),
+                            labelText: 'Valor'),
+                        keyboardType: TextInputType.numberWithOptions(),
+                        controller: _valorController,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return "Preenchimento Obrigatório!";
+                          } else if (double.tryParse(value) == null) {
+                            return '"$value" não é válido, use apenas números e "."';
+                          } else {
+                            return null;
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(
+                            icon: Icon(
+                              Icons.info_outline,
+                              color: Colors.deepPurple,
+                            ),
+                            labelText: 'Observação',
+                            hoverColor: Colors.deepPurple),
+                        controller: _observacaoController,
+                        cursorColor: Colors.deepPurple,
+                      ),
+                      DateTimePickerFormField(
+                        inputType: InputType.date,
+                        format: DateFormat("dd-MM-yyyy"),
+                        initialDate: DateTime(DateTime.now().year,
+                            DateTime.now().month, DateTime.now().day),
+                        editable: false,
+                        decoration: InputDecoration(
+                          hoverColor: Colors.deepPurple,
+                          icon:
+                              Icon(Icons.date_range, color: Colors.deepPurple),
+                          hasFloatingPlaceholder: false,
+                        ),
+                        validator: (value) {
+                          if (value == null) {
+                            return "selecione uma Data";
+                          } else {
+                            return null;
+                          }
+                        },
+                        onChanged: (dt) {
+                          setState(() {
+                            _novaOperacao.data =
+                                formatDate(dt, [dd, "/", mm, "/", yyyy]);
+                          });
+                          print(_novaOperacao.data);
+                        },
+                      ),
+                      const SizedBox(height: 30),
+                      MaterialButton(
+                        onPressed: () async {
+                          if (_formKey.currentState.validate()) {
+                            _novaOperacao.valor = _valorController.text;
+                            _novaOperacao.observacao =
+                                _observacaoController.text;
+                            _novaOperacao.tipo = tipo;
+                            var _operacaoSalva = await helper.saveOperacao(_novaOperacao);
+                            print("Operacao salva");
+                            print(_operacaoSalva);
+                            _getOperacoes(_selectedIndex);
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: Text(
+                          "Salvar",
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                        color: Colors.deepPurple,
+                        splashColor: Colors.deepPurpleAccent,
+                        elevation: 6,
+                        highlightElevation: 2,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                      ),
+                    ],
+                  ),
+                ),
+              ));
         });
   }
 
@@ -364,10 +481,14 @@ class _HomeState extends State<Home> {
                       Text(
                         movimentacoes[index].tipo,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18,),
-                          textAlign: TextAlign.start,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.start,
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Text(
                         "Data:",
                         style: TextStyle(fontSize: 16),
@@ -375,7 +496,8 @@ class _HomeState extends State<Home> {
                       ),
                       Text(
                         movimentacoes[index].data,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.start,
                       ),
                     ],
@@ -394,7 +516,8 @@ class _HomeState extends State<Home> {
                       ),
                       Text(
                         "R\$ " + movimentacoes[index].valor,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.end,
                       ),
                     ],
@@ -471,48 +594,48 @@ class _HomeState extends State<Home> {
     final _formKey = GlobalKey<FormState>();
 
     return showDialog(
-      context: context,
-      builder: (context) {
-      return AlertDialog(
-        title: Text("Configurações"),
-        content: Form(
-          key: _formKey,
-          child: TextFormField(
-            decoration: InputDecoration(
-              labelText: "Valor Limite:",
-              labelStyle: TextStyle(color: Colors.deepPurple, fontSize: 20),
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Configurações"),
+            content: Form(
+              key: _formKey,
+              child: TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Valor Limite:",
+                  labelStyle: TextStyle(color: Colors.deepPurple, fontSize: 20),
+                ),
+                //initialValue: _valorLimite,
+                controller: _valorController,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return "Digite um valor";
+                  } else if (double.tryParse(value) == Null) {
+                    return "Valor Inválido, utilize apenas números e '.'";
+                  } else {
+                    return null;
+                  }
+                },
+                keyboardType: TextInputType.number,
+              ),
             ),
-            //initialValue: _valorLimite,
-            controller: _valorController,
-            validator: (value){
-              if(value.isEmpty) {
-                return "Digite um valor";
-              } else if(double.tryParse(value) == Null) {
-                return "Valor Inválido, utilize apenas números e '.'";
-              } else {
-                return null;
-              }
-            },
-            keyboardType: TextInputType.number,
-          ),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.save),
-            color: Colors.deepPurple,
-            onPressed: (){
-              if(_formKey.currentState.validate()){
-                setState(() {
-                 _valorLimite =  _valorController.text;
-                });
-                print(_valorLimite);
-                Navigator.pop(context);
-              }
-            },
-          )
-        ],
-      );
-    });
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.save),
+                color: Colors.deepPurple,
+                onPressed: () {
+                  if (_formKey.currentState.validate()) {
+                    setState(() {
+                      _valorLimite = _valorController.text;
+                    });
+                    print(_valorLimite);
+                    Navigator.pop(context);
+                  }
+                },
+              )
+            ],
+          );
+        });
   }
 
   apagaOperacao(int index) async {
@@ -640,7 +763,7 @@ class _HomeState extends State<Home> {
     }
     if (movimentacoes.length == 0) _total = 0;
     setState(() {
-      _valorTotal = _total.toString();
+      _valorTotal = _total.toStringAsPrecision(5);
     });
   }
 

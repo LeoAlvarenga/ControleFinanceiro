@@ -1,4 +1,3 @@
-import 'package:controle_financeiro/ui/home_page.dart';
 import 'package:controle_financeiro/ui/splash.dart';
 import 'package:flutter/material.dart';
 
